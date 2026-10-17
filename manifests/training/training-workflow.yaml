@@ -14,7 +14,7 @@ spec:
       - name: update_manifests_image
         value: ghcr.io/pekk4/argo-git-tools:latest
       - name: repo_url
-        value: https://github.com/pekk4/mlops-demo.git
+        value: https://github.com/pekk4/mlops-demo2.git
       - name: tracking_uri
         value: http://mlflow.mlflow.svc.cluster.local
       - name: s3_endpoint
