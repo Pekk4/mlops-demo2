@@ -1,0 +1,42 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Sensor
+metadata:
+  name: training-sensor
+  namespace: argo-events
+spec:
+  eventBusName: default
+  template:
+    serviceAccountName: argo-events-sa
+
+  dependencies:
+    - name: training-webhook
+      eventSourceName: training-webhook
+      eventName: training
+
+  triggers:
+    - template:
+        name: submit-training-workflow
+        argoWorkflow:
+          operation: submit
+          source:
+            resource:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Workflow
+              metadata:
+                generateName: wine-train-
+                namespace: ml-workflows
+              spec:
+                workflowTemplateRef:
+                  name: train-template
+                arguments:
+                  parameters:
+                    - name: training_image
+                      value: ghcr.io/pekk4/mlops-demo:latest
+                    - name: update_manifests_image
+                      value: ghcr.io/pekk4/argo-git-tools:latest
+                    - name: repo_url
+                      value: https://github.com/pekk4/mlops-demo.git
+                    - name: tracking_uri
+                      value: http://mlflow.mlflow.svc.cluster.local
+                    - name: s3_endpoint
+                      value: http://minio.minio.svc.cluster.local:9000

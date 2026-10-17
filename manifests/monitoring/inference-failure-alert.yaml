@@ -1,0 +1,21 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: wine-model-rules
+  namespace: default
+  labels:
+    monitoring: model-rules
+spec:
+  groups:
+    - name: wine-model.rules
+      rules:
+        - alert: WineModelInferenceFailures
+          expr: increase(model_infer_request_failure_total{model="wine"}[2m]) > 3
+          for: 10s
+          labels:
+            severity: warning
+            model: wine
+            trigger: retraining
+          annotations:
+            summary: Wine model inference failures detected
+            description: Demo retraining trigger fired from MLServer inference failure metric.
